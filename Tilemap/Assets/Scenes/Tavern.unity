@@ -4482,7 +4482,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 658591603}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: affd45d586d93c64e80348d67770caf1, type: 3}
+  m_Script: {fileID: 11500000, guid: 5ab13079363247e42a1f5dafb2a17d50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   overlayPrefab: {fileID: 590182450890104418, guid: 405ea09832dbc3e4096a98a266dcd809, type: 3}
@@ -8167,7 +8167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1646276329}
   - component: {fileID: 1646276328}
-  - component: {fileID: 1646276327}
+  - component: {fileID: 1646276330}
   m_Layer: 0
   m_Name: Cursor
   m_TagString: Untagged
@@ -8175,20 +8175,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1646276327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1646276326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 030f417f248b7004ba942de4782f7eb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterPrefab: {fileID: 7748682119805359102, guid: bfd546cef423a95458cdaf239f4d9994, type: 3}
-  character: {fileID: 0}
 --- !u!212 &1646276328
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8256,3 +8242,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1646276330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646276326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b378b776784c4114eb9ec528d4591bdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursor: {fileID: 1646276326}
+  speed: 2
+  characterPrefab: {fileID: 7748682119805359102, guid: bfd546cef423a95458cdaf239f4d9994, type: 3}

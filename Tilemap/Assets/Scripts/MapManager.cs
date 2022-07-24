@@ -2,25 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Linq;
 
 public class MapManager : MonoBehaviour
 {
     private static MapManager _instance;
-    public static MapManager Instance { get { return _instance; } }
+    public static MapManager Instance { get { return _instance; } } //Ну це тупо синглтон, доступ до якого надається через властивість, інкапсуляція хулі
 
 
-    public GameObject overlayPrefab;
-    public GameObject overlayContainer;
+    public Dictionary<Vector2Int, GameObject> map; //Це словник з тайлами, словник це колекція, що приймає 2 параметри: Ключ і Значення, ключ це тип даних, а значення тип прийнятих значень
 
-    public Dictionary<Vector2Int, OverlayTile> map;
-    public bool ignoreBottomTiles;
 
-    private void Awake()
+
+    [SerializeField] private GameObject overlayTilePrefab;  //Це два поля, що задаються в інспекторі (про це сигналізує [SerialzeField]), приймають у себе геймобжект сховища клітин і префаб цих клітин
+    [SerializeField] private GameObject overlayTilesContainer;
+
+
+    private void Awake() 
     {
         if (_instance != null && _instance != this)
         {
-            Destroy(this.gameObject);
+            Debug.Log("Singleton of tilemap already exists, replacing it with new...");
+            Destroy(this.gameObject); //Жестко надристал полный синглтон говна
         }
         else
         {
@@ -30,40 +32,35 @@ public class MapManager : MonoBehaviour
 
     void Start()
     {
-        var tileMaps = gameObject.transform.GetComponentsInChildren<Tilemap>().OrderByDescending(x => x.GetComponent<TilemapRenderer>().sortingOrder);
-        map = new Dictionary<Vector2Int, OverlayTile>();
+        var tileMap = gameObject.GetComponentInChildren<Tilemap>(); 
+        map = new Dictionary<Vector2Int, GameObject>();
 
-        foreach (var tm in tileMaps)
+        BoundsInt bounds = tileMap.cellBounds; 
+
+
+        //Пробігаємось по координатах ігрового поля
+        for (int z = bounds.max.z; z >= -bounds.min.z; z--)
         {
-            BoundsInt bounds = tm.cellBounds;
-
-            for (int z = bounds.max.z; z >= bounds.min.z; z--)
+            for (int y = bounds.min.y; y < bounds.max.y; y++)
             {
-                for (int y = bounds.min.y; y < bounds.max.y; y++)
+                for (int x = bounds.min.x; x < bounds.max.x; x++)
                 {
-                    for (int x = bounds.min.x; x < bounds.max.x; x++)
+                    var tileLocation = new Vector3Int(x, y, z); //Привласнюємо координати клітинам
+                    var tileKey = new Vector2Int(x, y); //Задаємо ключ із двох координат, щоб потім передати його до словника
+                    if (tileMap.HasTile(tileLocation) && !map.ContainsKey(tileKey))
                     {
-                        if (z == 0 && ignoreBottomTiles)
-                            return;
-
-                        if (tm.HasTile(new Vector3Int(x, y, z)))
-                        {
-                            if (!map.ContainsKey(new Vector2Int(x, y)))
-                            {
-                                var overlayTile = Instantiate(overlayPrefab, overlayContainer.transform);
-                                var cellWorldPosition = tm.GetCellCenterWorld(new Vector3Int(x, y, z));
-                                
-                                
-                                overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z + 1);
-                                //overlayTile.GetComponent<SpriteRenderer>().sortingOrder = tm.GetComponent<TilemapRenderer>().sortingOrder;
-                                overlayTile.gameObject.GetComponent<OverlayTile>().gridLocation = new Vector3Int(x, y, z);
-
-                                map.Add(new Vector2Int(x, y), overlayTile.gameObject.GetComponent<OverlayTile>());
-                            }
-                        }
+                        var overlayTile = Instantiate(overlayTilePrefab, overlayTilesContainer.transform); //Закидаємо в змінну префаб клітини та інстанціюємо його в об'єкті TilesContainer
+                        var cellWorldPosition = tileMap.GetCellCenterWorld(tileLocation);
+                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z);
+                        map.Add(tileKey, overlayTile); //Закидаємо все в словник, рядки зверху ^ задають позицію клітин
                     }
                 }
-            }
+            }           
         }
+    }
+
+    void Update()
+    {
+        
     }
 }
