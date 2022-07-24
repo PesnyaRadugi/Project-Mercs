@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Linq;
 
 public class MapManager : MonoBehaviour
 {
     private static MapManager _instance;
     public static MapManager Instance { get { return _instance; } }
 
+
     public GameObject overlayPrefab;
     public GameObject overlayContainer;
 
-    public Dictionary<Vector2Int, GameObject> map;
+    public Dictionary<Vector2Int, OverlayTile> map;
     public bool ignoreBottomTiles;
 
     private void Awake()
@@ -26,41 +28,42 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        var tileMap = gameObject.GetComponentInChildren<Tilemap>();
-        map = new Dictionary<Vector2Int, GameObject>();
+        var tileMaps = gameObject.transform.GetComponentsInChildren<Tilemap>().OrderByDescending(x => x.GetComponent<TilemapRenderer>().sortingOrder);
+        map = new Dictionary<Vector2Int, OverlayTile>();
 
-        BoundsInt bounds = tileMap.cellBounds;
-
-        for (int z = bounds.max.z; z >= bounds.min.z; z--)
+        foreach (var tm in tileMaps)
         {
-            for (int y = bounds.min.y; y < bounds.max.y; y++)
-            {
-                for (int x = bounds.min.x; x < bounds.max.x; x++)
-                {
-                    if (z == 0 && ignoreBottomTiles)
-                        return;
+            BoundsInt bounds = tm.cellBounds;
 
-                    var tileLocation = new Vector3Int(x, y, z);
-                    var tileKey = new Vector2Int(x, y);
-                    if (tileMap.HasTile(tileLocation) && !map.ContainsKey(tileKey))
+            for (int z = bounds.max.z; z >= bounds.min.z; z--)
+            {
+                for (int y = bounds.min.y; y < bounds.max.y; y++)
+                {
+                    for (int x = bounds.min.x; x < bounds.max.x; x++)
                     {
-                        var overlayTile = Instantiate(overlayPrefab, overlayContainer.transform);
-                        var cellWorldPosition = tileMap.GetCellCenterWorld(tileLocation);
-                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z + 1);
-                        //overlayTile.GetComponent<SpriteRenderer>().sortingOrder = tileMap.GetComponent<TilemapRenderer>().sortingOrder;
-                        map.Add(tileKey, overlayTile);
+                        if (z == 0 && ignoreBottomTiles)
+                            return;
+
+                        if (tm.HasTile(new Vector3Int(x, y, z)))
+                        {
+                            if (!map.ContainsKey(new Vector2Int(x, y)))
+                            {
+                                var overlayTile = Instantiate(overlayPrefab, overlayContainer.transform);
+                                var cellWorldPosition = tm.GetCellCenterWorld(new Vector3Int(x, y, z));
+                                
+                                
+                                overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z + 1);
+                                //overlayTile.GetComponent<SpriteRenderer>().sortingOrder = tm.GetComponent<TilemapRenderer>().sortingOrder;
+                                overlayTile.gameObject.GetComponent<OverlayTile>().gridLocation = new Vector3Int(x, y, z);
+
+                                map.Add(new Vector2Int(x, y), overlayTile.gameObject.GetComponent<OverlayTile>());
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

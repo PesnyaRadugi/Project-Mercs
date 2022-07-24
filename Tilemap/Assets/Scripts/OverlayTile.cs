@@ -4,10 +4,16 @@ using UnityEngine;
 
 public class OverlayTile : MonoBehaviour
 {
-    private void Start()
-    {
-        
-    }
+    public int G;
+    public int H;
+    public int F { get { return G + H; } }
+
+    public bool isBlocked = false;
+
+    public OverlayTile Previous;
+
+    public Vector3Int gridLocation;
+
 
     private void Update()
     {
@@ -17,15 +23,15 @@ public class OverlayTile : MonoBehaviour
         }
     }
 
-    internal void ShowTile()
+    public void ShowTile()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
     }
 
-    internal void HideTile()
+
+    public void HideTile()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
     }
 
 }
-
