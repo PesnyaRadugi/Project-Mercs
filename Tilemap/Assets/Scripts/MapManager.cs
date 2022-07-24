@@ -12,7 +12,6 @@ public class MapManager : MonoBehaviour
     public Dictionary<Vector2Int, GameObject> map; //Це словник з тайлами, словник це колекція, що приймає 2 параметри: Ключ і Значення, ключ це тип даних, а значення тип прийнятих значень
 
 
-
     [SerializeField] private GameObject overlayTilePrefab;  //Це два поля, що задаються в інспекторі (про це сигналізує [SerialzeField]), приймають у себе геймобжект сховища клітин і префаб цих клітин
     [SerializeField] private GameObject overlayTilesContainer;
 

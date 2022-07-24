@@ -12,12 +12,12 @@ public class OverlayTile : MonoBehaviour
         }    
     }
 
-    private void HideTile()
+    internal void HideTile()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
     }
 
-    private void ShowTile()
+    internal void ShowTile()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
     }
