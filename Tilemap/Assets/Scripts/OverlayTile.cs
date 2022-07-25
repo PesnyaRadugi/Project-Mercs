@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class OverlayTile : MonoBehaviour
 {
+    public Vector3Int gridLocation;
+
+    
     private void Update() 
     {
         if (Input.GetMouseButtonDown(1))

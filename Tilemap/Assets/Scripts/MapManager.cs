@@ -9,10 +9,10 @@ public class MapManager : MonoBehaviour
     public static MapManager Instance { get { return _instance; } } //Ну це тупо синглтон, доступ до якого надається через властивість, інкапсуляція хулі
 
 
-    public Dictionary<Vector2Int, GameObject> map; //Це словник з тайлами, словник це колекція, що приймає 2 параметри: Ключ і Значення, ключ це тип даних, а значення тип прийнятих значень
+    public Dictionary<Vector2Int, OverlayTile> map; //Це словник з тайлами, словник це колекція, що приймає 2 параметри: Ключ і Значення, ключ це тип даних, а значення тип прийнятих значень
 
 
-    [SerializeField] private GameObject overlayTilePrefab;  //Це два поля, що задаються в інспекторі (про це сигналізує [SerialzeField]), приймають у себе геймобжект сховища клітин і префаб цих клітин
+    [SerializeField] private OverlayTile overlayTilePrefab;  //Це два поля, що задаються в інспекторі (про це сигналізує [SerialzeField]), приймають у себе геймобжект сховища клітин і префаб цих клітин
     [SerializeField] private GameObject overlayTilesContainer;
 
 
@@ -32,7 +32,7 @@ public class MapManager : MonoBehaviour
     void Start()
     {
         var tileMap = gameObject.GetComponentInChildren<Tilemap>(); 
-        map = new Dictionary<Vector2Int, GameObject>();
+        map = new Dictionary<Vector2Int, OverlayTile>();
 
         BoundsInt bounds = tileMap.cellBounds; 
 
@@ -51,6 +51,7 @@ public class MapManager : MonoBehaviour
                         var overlayTile = Instantiate(overlayTilePrefab, overlayTilesContainer.transform); //Закидаємо в змінну префаб клітини та інстанціюємо його в об'єкті TilesContainer
                         var cellWorldPosition = tileMap.GetCellCenterWorld(tileLocation);
                         overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z);
+                        overlayTile.gridLocation = tileLocation;
                         map.Add(tileKey, overlayTile); //Закидаємо все в словник, рядки зверху ^ задають позицію клітин
                     }
                 }
