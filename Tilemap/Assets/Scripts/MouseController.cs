@@ -5,15 +5,20 @@ using System.Linq;
 
 public class MouseController : MonoBehaviour
 {
+    //Spawning character & cursor
     [SerializeField] private GameObject characterPrefab;
     private CharacterInfo character;
     [SerializeField] private GameObject cursor;
-    [SerializeField] private float speed = 1;
 
+    //Pathfinding Fields
+    private PathFinder pathFinder;
+    [SerializeField] private List<OverlayTile> path;
+    [SerializeField] private float speed = 1f;
 
     void Start()
     {
-        
+        pathFinder = new PathFinder();
+        path = new List<OverlayTile>();
     }
 
     void LateUpdate() //Has sex with u'r mum
@@ -31,10 +36,35 @@ public class MouseController : MonoBehaviour
                 if (character == null)
                 {
                     character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
-                    PositionCharacterOnTile(overlayTile);   
+                    PositionCharacterOnTile(overlayTile);
+                    character.currentTile = overlayTile;
+                }
+                else
+                {
+                    path = pathFinder.FindPath(character.currentTile, overlayTile);
                 }
                 overlayTile.GetComponent<OverlayTile>().ShowTile();
             }
+        }
+
+        if (path.Count > 0)
+        {
+            FollowPath();
+        }
+    }
+
+    private void FollowPath()
+    {
+        var step = Time.deltaTime * speed;
+
+        var zIndex = path[0].transform.position.z;
+        character.transform.position = Vector2.MoveTowards(character.transform.position, path[0].transform.position, step);
+        character.transform.position = new Vector3(character.transform.position.x, character.transform.position.y, zIndex);
+
+        if (Vector2.Distance(character.transform.position, path[0].transform.position) < 0.0001f)
+        {
+            PositionCharacterOnTile(path[0]);
+            path.RemoveAt(0);
         }
     }
 

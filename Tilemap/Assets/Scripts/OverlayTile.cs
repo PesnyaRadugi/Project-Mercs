@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class OverlayTile : MonoBehaviour
 {
+    internal int G;
+    internal int H;
+    internal int F{ get {return G + H; } }
+    internal bool isBlocked = false;
+    internal OverlayTile previousTile;
+
+
     public Vector3Int gridLocation;
 
     
