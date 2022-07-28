@@ -1,2 +1,2 @@
 # Project-Mercs
-Isometric roguelike game inspired by Darkest Dungeon &amp; Wasteland 2.
+Isometric turn-based tactical rpg inspired by Battle Brothers and Fallout
