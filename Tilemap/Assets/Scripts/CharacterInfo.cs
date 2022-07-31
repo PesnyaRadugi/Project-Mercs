@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class CharacterInfo : MonoBehaviour
 {
-    public OverlayTile currentTile;
-
+    public PathNode currentNode;
 
     void Start()
     {

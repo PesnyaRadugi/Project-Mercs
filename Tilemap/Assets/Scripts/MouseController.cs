@@ -12,23 +12,23 @@ public class MouseController : MonoBehaviour
 
     //Pathfinding Fields
     private PathFinder pathFinder;
-    [SerializeField] private List<OverlayTile> path;
+    [SerializeField] private List<PathNode> path;
     [SerializeField] private float speed = 1f;
 
     void Start()
     {
         pathFinder = new PathFinder();
-        path = new List<OverlayTile>();
+        path = new List<PathNode>();
     }
 
-    void LateUpdate() //Has sex with u'r mum
+    private void LateUpdate() //Has sex with u'r mum
     {
-        RaycastHit2D? hit = GetFocusedOnTile();
+        RaycastHit2D? hit = GetFocusedOnNode();
 
         if (hit.HasValue)
         {
-            OverlayTile overlayTile = hit.Value.collider.gameObject.GetComponent<OverlayTile>();
-            cursor.transform.position = overlayTile.transform.position;
+            PathNode pathNode = hit.Value.collider.gameObject.GetComponent<PathNode>();
+            cursor.transform.position = pathNode.transform.position;
 
             if (Input.GetMouseButtonDown(1))
             {
@@ -36,14 +36,14 @@ public class MouseController : MonoBehaviour
                 if (character == null)
                 {
                     character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
-                    PositionCharacterOnTile(overlayTile);
-                    character.currentTile = overlayTile;
+                    PositionCharacterOnNode(pathNode);
+                    character.currentNode = pathNode;
                 }
                 else
                 {
-                    path = pathFinder.FindPath(character.currentTile, overlayTile);
+                    path = pathFinder.FindPath(character.currentNode, pathNode);
                 }
-                overlayTile.GetComponent<OverlayTile>().ShowTile();
+                pathNode.GetComponent<PathNode>().ShowNode();
             }
         }
 
@@ -63,18 +63,18 @@ public class MouseController : MonoBehaviour
 
         if (Vector2.Distance(character.transform.position, path[0].transform.position) < 0.0001f)
         {
-            PositionCharacterOnTile(path[0]);
+            PositionCharacterOnNode(path[0]);
             path.RemoveAt(0);
         }
     }
 
-    private void PositionCharacterOnTile(OverlayTile overlayTile) //Places character on selected tile
+    private void PositionCharacterOnNode(PathNode pathNode) //Places character on selected tile
     {
-        character.transform.position = new Vector3(overlayTile.transform.position.x, overlayTile.transform.position.y, overlayTile.transform.position.z);
-        character.currentTile = overlayTile;
+        character.transform.position = new Vector3(pathNode.transform.position.x, pathNode.transform.position.y, pathNode.transform.position.z);
+        character.currentNode = pathNode;
     }
 
-    private RaycastHit2D? GetFocusedOnTile() //Tile selection method
+    private RaycastHit2D? GetFocusedOnNode() //Tile selection method
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 mousePos2D  = new Vector2(mousePos.x, mousePos.y);

@@ -119,4 +119,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d0dcb0215193a846a64b762314f30aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentTile: {fileID: 0}
+  currentNode: {fileID: 0}
+  characterPrefab: {fileID: 7748682119805359102}

@@ -2,32 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OverlayTile : MonoBehaviour
+public class PathNode : MonoBehaviour
 {
-    internal int G;
-    internal int H;
-    internal int F{ get {return G + H; } }
+    //Pathfndig
+    internal int gCost;
+    internal int hCost;
+    internal int fCost{ get {return gCost + hCost; } }
     internal bool isBlocked = false;
-    internal OverlayTile previousTile;
+    internal PathNode previousNode;
 
-
-    public Vector3Int gridLocation;
+    //Coordinates
+    internal Vector3Int gridLocation;
 
     
     private void Update() 
     {
         if (Input.GetMouseButtonDown(1))
         {
-            HideTile();
+            HideNode();
         }    
     }
 
-    internal void HideTile()
+    internal void HideNode()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
     }
 
-    internal void ShowTile()
+    internal void ShowNode()
     {
         gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
     }

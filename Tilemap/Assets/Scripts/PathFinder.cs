@@ -5,38 +5,42 @@ using System.Linq;
 
 public class PathFinder
 {
-    internal List<OverlayTile> FindPath(OverlayTile start, OverlayTile end)
+    private const int kStraightCost = 10;
+    private const int kDiagonalCost = 14;
+
+    
+    internal List<PathNode> FindPath(PathNode start, PathNode end)
     {
-        List<OverlayTile> openList = new List<OverlayTile>();
-        List<OverlayTile> closedList = new List<OverlayTile>();
+        List<PathNode> openList = new List<PathNode>();
+        List<PathNode> closedList = new List<PathNode>();
 
         openList.Add(start);
 
         while(openList.Count > 0)
         {
-            OverlayTile currentOverlayTile = openList.OrderBy(x => x.F).First();
-            openList.Remove(currentOverlayTile);
-            closedList.Add(currentOverlayTile);
+            PathNode currentPathNode = openList.OrderBy(x => x.fCost).First();
+            openList.Remove(currentPathNode);
+            closedList.Add(currentPathNode);
 
-            if (currentOverlayTile == end)
+            if (currentPathNode == end)
             {
                 //quit
                 return GetCompleteList(start, end);
             }
         
-            var neighbourTiles = GetNeighbourTiles(currentOverlayTile);
+            var neighbourNodes = GetNeighbourNodes(currentPathNode);
 
-            foreach (var neighbour in neighbourTiles)
+            foreach (var neighbour in neighbourNodes)
             {
                 //1 - условная высота прыжка, если выстраивать уровни по вертикали, можно будет нахер выпилить
-                if (neighbour.isBlocked || closedList.Contains(neighbour) || Mathf.Abs(currentOverlayTile.gridLocation.z - neighbour.gridLocation.z) > 1)
+                if (neighbour.isBlocked || closedList.Contains(neighbour) || Mathf.Abs(currentPathNode.gridLocation.z - neighbour.gridLocation.z) > 1)
                 {
                     continue;
                 }
 
-                neighbour.G = GetManhattenDistance(start, neighbour);
-                neighbour.H = GetManhattenDistance(end, neighbour);
-                neighbour.previousTile = currentOverlayTile;
+                neighbour.gCost = GetManhattenDistance(start, neighbour);
+                neighbour.hCost = GetManhattenDistance(end, neighbour);
+                neighbour.previousNode = currentPathNode;
 
                 if (!openList.Contains(neighbour))
                 {
@@ -46,25 +50,28 @@ public class PathFinder
 
         }
 
-        return new List<OverlayTile>();         
+        return new List<PathNode>();         
     }
 
-    private int GetManhattenDistance(OverlayTile start, OverlayTile neighbour)
+    private int GetManhattenDistance(PathNode start, PathNode neighbour)
     {
-        return Mathf.Abs(start.gridLocation.x - neighbour.gridLocation.x) + Mathf.Abs(start.gridLocation.y - neighbour.gridLocation.y);
+        int xDistance = Mathf.Abs(start.gridLocation.x - neighbour.gridLocation.x);
+        int yDistance = Mathf.Abs(start.gridLocation.y - neighbour.gridLocation.y);
+        int remaining = Mathf.Abs(xDistance - yDistance);
+        return kDiagonalCost * Mathf.Min(xDistance, yDistance) + kStraightCost * remaining;
     }
 
-    private List<OverlayTile> GetNeighbourTiles(OverlayTile currentOverlayTile)
+    private List<PathNode> GetNeighbourNodes(PathNode currentPathNode)
     {
         var map = MapManager.Instance.map;
 
-        List<OverlayTile> neighbours = new List<OverlayTile>();
+        List<PathNode> neighbours = new List<PathNode>();
 
         //Чекает соседние тайлы
         //Верх
         Vector2Int locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x, 
-            currentOverlayTile.gridLocation.y + 1);
+            currentPathNode.gridLocation.x, 
+            currentPathNode.gridLocation.y + 1);
 
         if (map.ContainsKey(locationToCheck))
         {
@@ -73,8 +80,8 @@ public class PathFinder
 
         //Низ
         locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x, 
-            currentOverlayTile.gridLocation.y - 1);
+            currentPathNode.gridLocation.x, 
+            currentPathNode.gridLocation.y - 1);
 
         if (map.ContainsKey(locationToCheck))
         {
@@ -83,8 +90,8 @@ public class PathFinder
 
         //Прави
         locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x + 1, 
-            currentOverlayTile.gridLocation.y);
+            currentPathNode.gridLocation.x + 1, 
+            currentPathNode.gridLocation.y);
 
         if (map.ContainsKey(locationToCheck))
         {
@@ -93,28 +100,66 @@ public class PathFinder
         
         //Леви
         locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x - 1, 
-            currentOverlayTile.gridLocation.y);
+            currentPathNode.gridLocation.x - 1, 
+            currentPathNode.gridLocation.y);
 
         if (map.ContainsKey(locationToCheck))
         {
             neighbours.Add(map[locationToCheck]);
         }
 
+        //Говно из жопы, надо фиксить если хотим движение по диагонали
+
+        // locationToCheck = new Vector2Int(
+        //     currentOverlayTile.gridLocation.x + 1, 
+        //     currentOverlayTile.gridLocation.y + 1);
+
+        // if (map.ContainsKey(locationToCheck))
+        // {
+        //     neighbours.Add(map[locationToCheck]);
+        // }
+
+        // locationToCheck = new Vector2Int(
+        //     currentOverlayTile.gridLocation.x + 1, 
+        //     currentOverlayTile.gridLocation.y - 1);
+
+        // if (map.ContainsKey(locationToCheck))
+        // {
+        //     neighbours.Add(map[locationToCheck]);
+        // }
+
+        // locationToCheck = new Vector2Int(
+        //     currentOverlayTile.gridLocation.x - 1, 
+        //     currentOverlayTile.gridLocation.y + 1);
+
+        // if (map.ContainsKey(locationToCheck))
+        // {
+        //     neighbours.Add(map[locationToCheck]);
+        // }
+        
+        // locationToCheck = new Vector2Int(
+        //     currentOverlayTile.gridLocation.x - 1, 
+        //     currentOverlayTile.gridLocation.y - 1);
+
+        // if (map.ContainsKey(locationToCheck))
+        // {
+        //     neighbours.Add(map[locationToCheck]);
+        // }
+
         return neighbours;
 
     }
 
-    private List<OverlayTile> GetCompleteList(OverlayTile start, OverlayTile end)
+    private List<PathNode> GetCompleteList(PathNode start, PathNode end)
     {
-        List<OverlayTile> completeList = new List<OverlayTile>();
+        List<PathNode> completeList = new List<PathNode>();
 
-        OverlayTile currentTile = end;
+        PathNode currentNode = end;
 
-        while(currentTile != start)
+        while(currentNode != start)
         {
-            completeList.Add(currentTile);
-            currentTile = currentTile.previousTile;
+            completeList.Add(currentNode);
+            currentNode = currentNode.previousNode;
         }
 
         completeList.Reverse();
