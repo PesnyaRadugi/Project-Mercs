@@ -14,8 +14,9 @@ public class PathFinding
 
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
-        var _map = MapManager.Instance.map;
+        var _map = MapManager.Instance.map; //Yay, singleSHIT
         var _tilemap = MapManager.Instance.tilemap;
+
         var startNode = GetNode(startX, startY);
         var endNode = GetNode(endX, endY);
         _openList = new List<PathNode> { startNode };
