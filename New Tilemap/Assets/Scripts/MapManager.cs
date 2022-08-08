@@ -16,7 +16,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject cursorTile;
 
     [Header("Pathfinding shit")]
-    [SerializeField] private Tilemap floor;
+    [SerializeField] internal Tilemap floor;
     [SerializeField] private Tilemap anotherMap;
     [SerializeField] private TileBase tile;
     private PathFinding pathfinding;
@@ -24,20 +24,23 @@ public class MapManager : MonoBehaviour
     public Tilemap tilemap { get { return _tilemap; } }
     private Dictionary<Vector2Int, PathNode> _map;
     public Dictionary<Vector2Int, PathNode> map { get { return _map; } }
-    private List<PathNode> path;
+    internal List<PathNode> path;
+    [SerializeField] private CharacterController character;
 
     private void Awake() 
     {
+        //Жестко надристал полный синглтон говна
         if (_instance != null && _instance != this)
         {
             Debug.Log("Singleton of tilemap already exists, replacing it with new...");
-            Destroy(this.gameObject); //Жестко надристал полный синглтон говна
+            Destroy(this.gameObject);
         }
         else
         {
             _instance = this;
         }
 
+        // Обращение к Scriptable object
         dataFromTiles = new Dictionary<TileBase, TileData>();
 
         foreach (var tileData in tileDatas)
@@ -57,16 +60,21 @@ public class MapManager : MonoBehaviour
     }
     
     private void Update() 
-    {
-        var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        cursorTile.transform.position = floor.LocalToCell(mousePosition);
+    {   
+        // Отображение курсора
+        var mousePosition = floor.LocalToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        
+        if (map.ContainsKey((Vector2Int)mousePosition))
+        {
+            cursorTile.transform.position = floor.LocalToCell(mousePosition);
+        }
 
+        //Построение и отрисовка пути
         if(Input.GetMouseButtonDown(0)) 
         {
-            Vector3Int pos = floor.LocalToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-            //pos.z = 0;
-            if(path != null && map.ContainsKey(new Vector2Int(pos.x, pos.y))) {
-                path = pathfinding.FindPath(0, 0, pos.x, pos.y);
+            var pos = floor.LocalToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            if(path != null && map.ContainsKey((Vector2Int)pos)) {
+                path = pathfinding.FindPath(character.pos.x, character.pos.y, pos.x, pos.y);
                 anotherMap.ClearAllTiles();
                 for(int i = 0; i < path.Count; ++i) {
                     anotherMap.SetTile(new Vector3Int(path[i].x, path[i].y, 0), tile);
@@ -94,14 +102,14 @@ public class MapManager : MonoBehaviour
                 vi.x = x;
                 vi.y = y;
                 if(_tilemap.HasTile(new Vector3Int(x, y, bounds.zMin)))
-                    _map.Add(vi, new PathNode(x, y, GetTileMovementCost(new Vector2Int(x, y))));
+                    _map.Add(vi, new PathNode(x, y, GetTileMovementCost(vi)));
             }
         }
     }
 
-    internal int GetTileMovementCost(Vector2 worldPosition)
+    internal int GetTileMovementCost(Vector2 tilePositionInGrid)
     {
-        Vector3Int gridPosition = floor.WorldToCell(worldPosition);
+        Vector3Int gridPosition = floor.WorldToCell(tilePositionInGrid);
         TileBase tile = floor.GetTile(gridPosition);
         if (tile == null)
         {

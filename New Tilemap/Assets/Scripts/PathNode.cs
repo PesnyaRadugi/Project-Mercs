@@ -8,7 +8,7 @@ public class PathNode
     public int y;
     public int gScore;
     public int hScore;
-    public int fScore { get { return ( gScore + hScore ) * movementCost; } }
+    public int fScore { get { return ( gScore + hScore ); } }
     public int movementCost;
     public PathNode cameFrom = null;
 

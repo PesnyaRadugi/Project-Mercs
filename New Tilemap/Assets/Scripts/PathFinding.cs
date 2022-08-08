@@ -7,8 +7,6 @@ public class PathFinding
 {
     private const int kStraightCost = 1;
 
-    //private const int kDiagonalCost = 14; //Uncomment for Diagonal movement 
-
     private List<PathNode> _openList;
     private List<PathNode> _closedList;
 
@@ -41,18 +39,9 @@ public class PathFinding
             }
         }
 
-        int i = 0;
         while (_openList.Count > 0)
         {
-            ++i;
-            if (i > 1000)
-            {
-                Debug.Log("INFINITE!!!!");
-                return null;
-            }
             PathNode currentNode = FindWithLowestScore(_openList);
-
-            //Debug.Log(currentNode);
             if (currentNode == endNode)
             {
                 return CalculatePath(endNode);
@@ -104,10 +93,7 @@ public class PathFinding
         int xDistance = Mathf.Abs(from.x - to.x);
         int yDistance = Mathf.Abs(from.y - to.y);
         int remaining = Mathf.Abs(xDistance - yDistance);
-        // var movementCost = MapManager.Instance.GetTileMovementCost(new Vector2(xDistance, yDistance));
         return
-        //Uncomment for Diagonal movement 
-        //kDiagonalCost * Mathf.Min(xDistance, yDistance) +
         kStraightCost * remaining;
     }
 
@@ -118,19 +104,6 @@ public class PathFinding
         if (HasTile(node.x, node.y + 1)) neighbours.Add(GetNode(node.x, node.y + 1));
         if (HasTile(node.x - 1, node.y)) neighbours.Add(GetNode(node.x - 1, node.y));
         if (HasTile(node.x + 1, node.y)) neighbours.Add(GetNode(node.x + 1, node.y));
-
-        //Uncomment for diagonal movement
-        // if (HasTile(x - 1, y - 1)) neighbours.Add(GetNode(x - 1, y - 1));
-        // if (HasTile(x - 1, y + 1)) neighbours.Add(GetNode(x - 1, y + 1));
-        // if (HasTile(x + 1, y - 1)) neighbours.Add(GetNode(x + 1, y - 1));
-        // if (HasTile(x + 1, y + 1)) neighbours.Add(GetNode(x + 1, y + 1));
-
-        /*
-        Debug.Log($"Neighbours of node at {node.x},{node.y}:");
-        foreach(var n in neighbours) {
-            Debug.Log($"{n.x},{n.y}");
-        }
-        */
         return neighbours;
     }
 
