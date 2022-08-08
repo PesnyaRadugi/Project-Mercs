@@ -17,7 +17,7 @@ public class MapManager : MonoBehaviour
 
     [Header("Pathfinding shit")]
     [SerializeField] internal Tilemap floor;
-    [SerializeField] private Tilemap anotherMap;
+    [SerializeField] internal Tilemap anotherMap;
     [SerializeField] private TileBase tile;
     private PathFinding pathfinding;
     private Tilemap _tilemap;

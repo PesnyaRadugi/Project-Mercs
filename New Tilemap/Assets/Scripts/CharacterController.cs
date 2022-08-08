@@ -40,6 +40,7 @@ public class CharacterController : MonoBehaviour
         if (transform.position == new Vector3(path[0].x + 0.5f, path[0].y + 0.5f))
         {
             PositionCharacterOnNode(path[0].x, path[0].y);
+            MapManager.Instance.anotherMap.SetTile(new Vector3Int(path[0].x, path[0].y), null);
             path.RemoveAt(0);
         }
     }
